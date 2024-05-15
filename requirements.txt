@@ -3,3 +3,4 @@ Django
 python-dotenv
 sqlparse
 tzdata
+gunicorn
