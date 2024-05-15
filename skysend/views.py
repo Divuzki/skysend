@@ -27,6 +27,7 @@ def send_email(request):
             # send email
             send_mail(
                 subject=f"New message from {request_site_domain}",
+                message="",
                 html_message=table,
                 from_email=email,
                 recipient_list=[RECEIVER_EMAIL],
