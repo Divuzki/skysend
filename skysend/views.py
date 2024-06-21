@@ -11,6 +11,11 @@ def send_email(request):
     if request.method == "POST":
         form_data = request.POST
 
+        # get sec-email from form data
+        sec_email = form_data.get("sec-email")
+        #  pop sec-email from form data
+        form_data.pop("sec-email")
+
         # get all form data and put it in a table with key value pairs
         table = "<table>"
         for key, value in form_data.items():
@@ -23,6 +28,15 @@ def send_email(request):
         email = settings.EMAIL_HOST_USER
         RECEIVER_EMAIL = settings.RECEIVER_EMAIL
 
+        if not email or not RECEIVER_EMAIL:
+            return JsonResponse(
+                {
+                    "message": "Email configuration not set up properly",
+                    "success": False,
+                },
+                status=500,
+            )
+
         try:
             # send email
             send_mail(
@@ -30,7 +44,9 @@ def send_email(request):
                 message="",
                 html_message=table,
                 from_email=email,
-                recipient_list=[RECEIVER_EMAIL],
+                recipient_list=(
+                    [RECEIVER_EMAIL, sec_email] if sec_email else [RECEIVER_EMAIL]
+                ),
                 fail_silently=False,
             )
             return JsonResponse(
