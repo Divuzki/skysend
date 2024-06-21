@@ -13,8 +13,6 @@ def send_email(request):
 
         # get sec-email from form data
         sec_email = form_data.get("sec-email")
-        #  pop sec-email from form data
-        form_data.pop("sec-email")
 
         # get all form data and put it in a table with key value pairs
         table = "<table>"
