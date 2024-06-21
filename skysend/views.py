@@ -17,6 +17,9 @@ def send_email(request):
         # get all form data and put it in a table with key value pairs
         table = "<table>"
         for key, value in form_data.items():
+            # skip sec-email
+            if key == "sec-email":
+                continue
             table += "<tr><td>{}</td><td>{}</td></tr>".format(key, value)
         table += "</table>"
 
