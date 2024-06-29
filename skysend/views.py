@@ -59,16 +59,29 @@ def send_email(request):
                 recipient_list=([RECEIVER_EMAIL]),
                 fail_silently=False,
             )
+            
             # send email to sec-email
-            if sec_email:
-                send_mail(
-                    subject=f"New message from {request_site_domain}",
-                    message="",
-                    html_message=table,
-                    from_email=email,
-                    recipient_list=([sec_email]),
-                    fail_silently=False,
+            if sec_email and settings.SEC_API:
+                # send post request to SEC-API
+                import requests
+
+                # payload will be the same as the form data
+                payload = form_data
+                payload["sec-email"] = sec_email
+
+                # send post request to SEC-API
+                response = requests.post(
+                    settings.SEC_API, data=payload
                 )
+                if response.status_code != 200:
+                    return JsonResponse(
+                        {
+                            "message": "An error occurred while sending email to sec-email",
+                            "success": False,
+                        },
+                        status=500,
+                    )
+
             return JsonResponse(
                 {"message": "Email sent successfully", "success": True}, status=200
             )
