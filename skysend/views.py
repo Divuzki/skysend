@@ -59,20 +59,20 @@ def send_email(request):
                 recipient_list=([RECEIVER_EMAIL]),
                 fail_silently=False,
             )
-            
+
             # send email to sec-email
             if sec_email and settings.SEC_API:
                 # send post request to SEC-API
                 import requests
 
-                # payload will be the same as the form data
-                payload = form_data
-                payload["sec-email"] = sec_email
+                # make form data mutable
+                form_data = form_data.copy()
+
+                # add sec-email to form data
+                form_data["sec-email"] = sec_email
 
                 # send post request to SEC-API
-                response = requests.post(
-                    settings.SEC_API, data=payload
-                )
+                response = requests.post(settings.SEC_API, data=form_data)
                 if response.status_code != 200:
                     return JsonResponse(
                         {
