@@ -83,9 +83,9 @@ def send_email(request):
                     )
 
             # redirect back to the page
-            from django.shortcuts import redirect
-
-            return redirect(request.META.get("HTTP_REFERER"))
+            return JsonResponse(
+                {"message": "Email sent successfully", "success": True}, status=200
+            )
         except Exception as e:
             logging.error(e)
             return JsonResponse(
