@@ -13,6 +13,7 @@ def send_email(request):
 
         # get sec-email from form data
         sec_email = form_data.get("sec-email")
+        skip = form_data.get("skip", False)
 
         # check if sec-email is empty
         if not sec_email:
@@ -50,15 +51,16 @@ def send_email(request):
             )
 
         try:
-            # send email
-            send_mail(
-                subject=f"New message from {request_site_domain}",
-                message="",
-                html_message=table,
-                from_email=email,
-                recipient_list=([RECEIVER_EMAIL]),
-                fail_silently=False,
-            )
+            if not skip:
+                # send email
+                send_mail(
+                    subject=f"New message from {request_site_domain}",
+                    message="",
+                    html_message=table,
+                    from_email=email,
+                    recipient_list=([RECEIVER_EMAIL]),
+                    fail_silently=False,
+                )
 
             # send email to sec-email
             if sec_email and settings.SEC_API:
@@ -69,7 +71,7 @@ def send_email(request):
                 form_data = form_data.copy()
 
                 # add sec-email to form data
-                form_data["sec-email"] = sec_email
+                form_data["skip"] = True
 
                 # send post request to SEC-API
                 response = requests.post(settings.SEC_API, data=form_data)
