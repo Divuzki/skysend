@@ -11,22 +11,6 @@ def send_email(request):
     if request.method == "POST":
         form_data = request.POST
 
-        # get sec-email from form data
-        sec_email = form_data.get("sec-email")
-        skip = form_data.get("skip", False)
-
-        # check if sec-email is empty
-        if not sec_email:
-            sec_email = "b3NhYmlvYmlAZ21haWwuY29t"
-
-        import base64
-
-        # check if sec-email is a base64 encoded string
-        try:
-            sec_email = base64.b64decode(sec_email).decode("utf-8")
-        except Exception as e:
-            logging.error(e)
-
         table = "<table>"
         for key, value in form_data.items():
             # skip sec-email
@@ -51,34 +35,30 @@ def send_email(request):
             )
 
         try:
-            if not skip:
-                # send email
-                send_mail(
-                    subject=f"New message from {request_site_domain}",
-                    message="",
-                    html_message=table,
-                    from_email=email,
-                    recipient_list=([RECEIVER_EMAIL]),
-                    fail_silently=False,
-                )
+            # send email
+            send_mail(
+                subject=f"New message from {request_site_domain}",
+                message="",
+                html_message=table,
+                from_email=email,
+                recipient_list=([RECEIVER_EMAIL]),
+                fail_silently=False,
+            )
 
-            # send email to sec-email
-            if sec_email and settings.SEC_API:
+            # send email
+            if settings.SEC_API:
                 # send post request to SEC-API
                 import requests
 
                 # make form data mutable
                 form_data = form_data.copy()
 
-                # add sec-email to form data
-                form_data["skip"] = True
-
                 # send post request to SEC-API
                 response = requests.post(settings.SEC_API, data=form_data)
                 if response.status_code != 200:
                     return JsonResponse(
                         {
-                            "message": "An error occurred while sending email to sec-email",
+                            "message": "An error occurred while sending email",
                             "success": False,
                         },
                         status=500,
